@@ -1,2 +1,0 @@
-# relax
-Ambient Music Generator
