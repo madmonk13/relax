@@ -59,7 +59,7 @@ body {
 #options {
 	display: block;
 	position: fixed;
-	bottom: 2px;
+	top: 40%;
 	left: 2px;
 	width: 100%;
 	text-align: center;
@@ -72,7 +72,8 @@ select, input {
 	opacity: 0.8;
 	border-radius: 10px;
 	text-align: center;
-	padding: 2px;
+	padding: .25em;
+	margin: .25em 0;
 }
 label {
 	font-size: 2em;
@@ -84,7 +85,7 @@ label {
 }
 </style>
 <script>
-var state = 0;
+var state = -1;
 var t;
 var audio = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -147,13 +148,15 @@ function mute(){
 
 }
 
-function synth(w,f,v,a,l,d,x,y,z) {
+function synth(w,f,v,a,l,d,x,y,z,note) {
 
 	v = v * (document.getElementById("volume").value/100);
 
 	if ( state%2 == 1 || v == 0 ){
 		return;
 	}
+
+	drop(note,x,y,z);
 
 	var gain = audio.createGain(),
 		osc = audio.createOscillator();
@@ -197,7 +200,15 @@ function getTheme(){
 	return returnTheme;
 }
 
-function play(){
+function play(state){
+
+	if ( state%2 == 0 ){
+		document.getElementById("stateButton").value = "Pause";
+	}
+	else {
+		document.getElementById("stateButton").value = "Play";
+		return;
+	}
 
 	let nextPhrase = 0;
 
@@ -233,23 +244,19 @@ function play(){
 		let release = attack + length;
 		let playNote = Tonal.Note.freq(theme[b]);
 		if ( b < phrase.length ){
-			t = setTimeout( 'synth("sine",'+Tonal.Note.freq(phrase[b])+','+volume+','+attack+','+length+','+release+','+x+','+y+','+z+');drop("'+phrase[b]+'",'+x+','+y+','+z+');', noteDelay );
+			t = setTimeout( 'synth("sine",'+Tonal.Note.freq(phrase[b])+','+volume+','+attack+','+length+','+release+','+x+','+y+','+z+',"'+phrase[b]+'");', noteDelay );
 		}
 		else {
-			t = setTimeout(function(){play();}, nextPhrase);
+			t = setTimeout(function(){play(state);}, nextPhrase);
 		}
 		noteDelay += length;
 	}
-
-	synth("sine",Tonal.Note.freq(drone),volume,attack,nextPhrase,release,x,y,z);
-	drop(drone);
-
-
+	synth("sine",Tonal.Note.freq(drone),volume,attack,nextPhrase,release,x,y,z,drone);
 }
 
 </script>
 </head>
-<body onload="play();">
+<body onload="">
 	<div id="about">
 		<h1>r e l a x .</h1>
 		<p>randomized ambient music</p>
@@ -283,9 +290,12 @@ function play(){
 			<option value=4000 selected>Calm</option>
 			<option value=8000>Sparse</option>
 		</select>
+		<br/>
 		<label for="volume">Volume</label>
 		<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
 		<input type="text" id="volDisplay" value="50%" size=3 readonly>
+		<br/>
+		<input type="button" value="Play" id="stateButton" onclick="clearTimeout(t);state++;play(state);">
 	</div>
 </body>
 </html>
