@@ -30,6 +30,16 @@ body {
 * {
 	font-family: Arial, Sans-Serif;
 }
+@keyframes fader {
+	0% { opacity: 1; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
+}
+h1 {
+	animation-name: fader;
+	animation-duration: 60s;
+	animation-iteration-count: infinite;
+}
 #about {
 	color: #fff;
 	opacity: 0.8;
@@ -240,6 +250,7 @@ function config(){
 }
 
 function play(state){
+	config();
 
 	if ( state%2 == 0 ){
 		document.getElementById("stateButton").value = "Pause";
@@ -258,6 +269,7 @@ function play(state){
 	let drone = thisPhrase['drone'][Math.floor(Math.random()*thisPhrase['drone'].length)];
 	let phraseLen = Math.floor(Math.random()*thisPhrase['melody'].length);
 	let phrase = new Array();
+
 	for (a = 0;a < phraseLen;a++ ){
 		phrase.push(thisPhrase['melody'][Math.floor(Math.random()*thisPhrase['melody'].length)]);
 	}
@@ -324,7 +336,7 @@ function config(){
 	}
 
 	let useScale = "";
-	if ( h <= 4 )		{ useScale = "dorian"; }
+	if ( h <= 4 )		{ useScale = "minor"; }
 	else if ( h <= 8 )	{ useScale = "pentatonic"; }
 	else if ( h <= 12 )	{ useScale = "major"; }
 	else if ( h <= 16 )	{ useScale = "pentatonic"; }
@@ -368,7 +380,6 @@ function config(){
 
 	document.getElementsByTagName("body")[0].style.backgroundColor = colors[h];
 
-	c = setTimeout(function(){config();},300000);
 }
 
 function toggleOptions(){
@@ -385,8 +396,7 @@ function toggleOptions(){
 <body onload="config();">
 	<div id="grad">&nbsp;</div>
 	<div id="about">
-		<h1>r e l a x .</h1>
-		<p>randomized ambient music</p>
+		<h1 style="font-family:Serif;">R  E  L  A  X</h1>
 		<div id="status"></div>
 		<div id="play"><a href="#" id="state" onclick="mute();">mute</a></div>
 
@@ -413,9 +423,14 @@ function toggleOptions(){
 		</select>
 		<select id="scale" name="scale">
 			<option value="pentatonic" selected>Pentatonic</option>
-			<option value="dorian">Dorian</option>
 			<option value="major">Major</option>
 			<option value="minor">Minor</option>
+<!--			<option value="dorian">Dorian</option>
+			<option value="phrygian">Phrygian</option>
+			<option value="lydian">Lydian</option>
+			<option value="mixolydian">Mixolydian</option>
+			<option value="Aeolian">Aeolian</option>
+			<option value="locrian">Locrian</option>-->
 		</select>
 		<select id="activity" name="activity">
 			<option value=1000>Busy</option>
