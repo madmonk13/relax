@@ -13,20 +13,31 @@ html {
 	height: 100%;
 }
 body {
+	background-color: #fff;
+	transition: background-color 2s;
+}
+#grad {
+	display: block;
+	position: fixed;
+	z-index: 0;
+	left: -10px;
+	top: -10px;
+	width: 101%;
+	height: 101%;
 	background-color: lightblue;
-	background: radial-gradient(lightblue,darkblue);
-	transition: background 1s;
+	background: radial-gradient(white,transparent,transparent);
 }
 * {
 	font-family: Arial, Sans-Serif;
 }
 #about {
 	color: #fff;
-	opacity: 0.5;
+	opacity: 0.8;
 	display: block;
 	width: 100%;
 	text-align: center;
 	margin-top: 10%;
+	z-index: 1;
 }
 @keyframes droplet {
 	0% { opacity: 1.0; transform:scale(1,1);}
@@ -47,6 +58,7 @@ body {
 	font-size: 12px;
 	color: #ddd;
 	line-height: 50px;
+	z-index: 1;
 }
 #play a {
 	display: none;
@@ -57,12 +69,15 @@ body {
 }
 
 #options {
+	opacity: 0;
+	transition: opacity 1s;
 	display: block;
 	position: fixed;
 	top: 40%;
 	left: 2px;
 	width: 100%;
 	text-align: center;
+	z-index: 999;
 }
 
 select, input {
@@ -83,10 +98,22 @@ label {
 	text-align: center;
 	padding: 2px;
 }
+
+#about label {
+	font-size: 1em;
+	color: #000;
+}
+
+#status {
+	display: none;
+}
+
 </style>
 <script>
 var state = -1;
 var t;
+var attack = 10;
+
 var audio = new (window.AudioContext || window.webkitAudioContext)();
 
 window.addEventListener('touchstart', function() {
@@ -200,6 +227,18 @@ function getTheme(){
 	return returnTheme;
 }
 
+function config(){
+	let m = new Date().getMonth()+1;
+	let d = new Date().getDate();
+	let y = new Date().getFullYear();
+	let h = new Date().getHours();
+	let i = new Date().getMinutes();
+	let s = new Date().getSeconds();
+
+	let keys = new Array("c","g","d","a","e","b","f#","c#","g#","d#","bb","f");
+
+}
+
 function play(state){
 
 	if ( state%2 == 0 ){
@@ -224,7 +263,6 @@ function play(state){
 	}
 
 	let volume = Math.random()*0.15
-	let attack = 10;
 	let delay = Math.random()*8000;
 	let x = (Math.random()*300 - 150);
 	let y = (Math.random()*300 - 150);
@@ -236,7 +274,6 @@ function play(state){
 	for (b=0;b<=phrase.length;b++){
 		let length = document.getElementById("activity").value*((Math.floor(Math.random()*8)+1)/8);
 		let volume = Math.random()*0.15
-		let attack = 10;
 		nextPhrase += length;
 		let x = (Math.random()*300 - 150);
 		let y = (Math.random()*300 - 150);
@@ -254,15 +291,111 @@ function play(state){
 	synth("sine",Tonal.Note.freq(drone),volume,attack,nextPhrase,release,x,y,z,drone);
 }
 
+var c;
+function config(){
+	if ( document.getElementById("settings").checked === true ){
+		return; // custom settings enabled
+	}
+
+	let m = new Date().getMonth()+1;
+	let d = new Date().getDate();
+	let y = new Date().getFullYear();
+	let h = new Date().getHours();
+	let i = new Date().getMinutes();
+	let s = new Date().getSeconds();
+
+	let keys = new Array("c","g","d","a","e","b","f#","c#","g#","d#","bb","f");
+
+	let root = keys[h%keys.length];
+	let modifier = "";
+	if ( root.length > 1 ){
+		modifier = root.charAt(1);
+		root = root.charAt(0);
+	}
+
+	document.getElementById("key").value = root;
+	document.getElementById("mod").value = modifier;
+
+	if ( i <= 20 || i >= 40 ){
+		document.getElementById("activity").value=4000;
+	}
+	else {
+		document.getElementById("activity").value = 2000;
+	}
+
+	let useScale = "";
+	if ( h <= 4 )		{ useScale = "dorian"; }
+	else if ( h <= 8 )	{ useScale = "pentatonic"; }
+	else if ( h <= 12 )	{ useScale = "major"; }
+	else if ( h <= 16 )	{ useScale = "pentatonic"; }
+	else if ( h <= 20 ) { useScale = "minor"; }
+	else				{ useScale = "pentatonic"; }
+
+	if ( h <= 6 || h >= 21 ){
+		document.getElementById("attack").value = 250;
+	}
+	else {
+		document.getElementById("attack").value = 10;
+	}
+
+	// I'm not in love with these color choices, but they'll do for now
+	let colors = new Array(
+		"#000000", // 0:00
+		"#004150", // 1:00
+		"#0052A5", // 2:00
+		"#9C65D4", // 3:00
+		"#9A93EC", // 4:00
+		"#00ADCE", // 5:00
+		"#65A9C4", // 6:00
+		"#73EBAE", // 7:00
+		"#4bbc2c", // 8:00
+		"#67c235", // 9:00
+		"#a3c235", // 10:00
+		"#a4d137", // 11:00
+		"#cce491", // 12:00
+		"#ffc015", // 13:00
+		"#ffa415", // 14:00
+		"#ff8915", // 15:00
+		"#ff7e15", // 16:00
+		"#ff5715", // 17:00
+		"#ff1520", // 18:00
+		"#ff1589", // 19:00
+		"#ff15ba", // 20:00
+		"#ec15ff", // 21:00
+		"#c015ff", // 22:00
+		"#731696", // 23:00
+	);
+
+	document.getElementsByTagName("body")[0].style.backgroundColor = colors[h];
+
+	c = setTimeout(function(){config();},300000);
+}
+
+function toggleOptions(){
+	if ( document.getElementById("settings").checked === true ){
+		document.getElementById("options").style.opacity = 0.8;
+	}
+	else {
+		document.getElementById("options").style.opacity = 0;
+	}
+}
+
 </script>
 </head>
-<body onload="">
+<body onload="config();">
+	<div id="grad">&nbsp;</div>
 	<div id="about">
 		<h1>r e l a x .</h1>
 		<p>randomized ambient music</p>
 		<div id="status"></div>
 		<div id="play"><a href="#" id="state" onclick="mute();">mute</a></div>
+
+		<input type="button" value="Play" id="stateButton" onclick="clearTimeout(t);state++;play(state);"><br/>
+
+		<input type="checkbox" name="settings" id="settings" onclick="toggleOptions();">
+		<label for="settings">Custom Settings</label><br/>
 	</div>
+
 	<div id="options">
 		<select id="key" name="key">
 			<option value="c">C</option>
@@ -290,12 +423,14 @@ function play(state){
 			<option value=4000 selected>Calm</option>
 			<option value=8000>Sparse</option>
 		</select>
+		<select id="attack" name="attack" onchange="attack=this.value*1;">
+			<option value=10>Crisp</option>
+			<option value=250>Soft</option>
+		</select>
 		<br/>
 		<label for="volume">Volume</label>
 		<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
 		<input type="text" id="volDisplay" value="50%" size=3 readonly>
-		<br/>
-		<input type="button" value="Play" id="stateButton" onclick="clearTimeout(t);state++;play(state);">
 	</div>
 </body>
 </html>
