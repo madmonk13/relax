@@ -41,7 +41,6 @@ h1 {
 	animation-iteration-count: infinite;
 }
 #about {
-	color: #fff;
 	opacity: 0.8;
 	display: block;
 	width: 100%;
@@ -102,7 +101,6 @@ select, input {
 }
 label {
 	font-size: 2em;
-	color: #fff;
 	opacity: 0.8;
 	border-radius: 10px;
 	text-align: center;
@@ -118,13 +116,17 @@ label {
 	display: none;
 }
 
+#stateButton {
+	padding: 8px 16px;
+	color: #333;
+}
 </style>
 <script>
 var state = -1;
 var t;
 var attack = 10;
-
 var audio = new (window.AudioContext || window.webkitAudioContext)();
+var colors = new Array("#000000","#1B1B1B","#614051","#732E6C","#A63A79","#3F26BF","#4F69C6","#2887C8","#0095B7","#29AB87","#63B76C","#BEE64B","#D9E650","#FFFF99","#E6BC5C","#E97451","#DA614E","#C62D42","#9C2542","#8A496B","#5946B2","#58427C","#2E2D88","#1B1B1B");
 
 window.addEventListener('touchstart', function() {
 	// create empty buffer
@@ -349,37 +351,8 @@ function config(){
 	else {
 		document.getElementById("attack").value = 10;
 	}
-
-	// I'm not in love with these color choices, but they'll do for now
-	let colors = new Array(
-		"#000000", // 0:00
-		"#004150", // 1:00
-		"#0052A5", // 2:00
-		"#9C65D4", // 3:00
-		"#9A93EC", // 4:00
-		"#00ADCE", // 5:00
-		"#65A9C4", // 6:00
-		"#73EBAE", // 7:00
-		"#4bbc2c", // 8:00
-		"#67c235", // 9:00
-		"#a3c235", // 10:00
-		"#a4d137", // 11:00
-		"#cce491", // 12:00
-		"#ffc015", // 13:00
-		"#ffa415", // 14:00
-		"#ff8915", // 15:00
-		"#ff7e15", // 16:00
-		"#ff5715", // 17:00
-		"#ff1520", // 18:00
-		"#ff1589", // 19:00
-		"#ff15ba", // 20:00
-		"#ec15ff", // 21:00
-		"#c015ff", // 22:00
-		"#731696", // 23:00
-	);
-
-	document.getElementsByTagName("body")[0].style.backgroundColor = colors[h];
-
+	document.getElementById("color").value = colors[h];
+	document.getElementsByTagName("body")[0].style.backgroundColor = document.getElementById("color").value;
 }
 
 function toggleOptions(){
@@ -391,12 +364,20 @@ function toggleOptions(){
 	}
 }
 
+function populateColors(){
+	for (var i in colors){
+		var o = document.createElement("option");
+			o.value = colors[i];
+			o.innerHTML = "<span style='color:"+colors[i]+"'>"+i+":00</span>";
+		document.getElementById("color").appendChild(o);
+	}
+}
 </script>
 </head>
-<body onload="config();">
+<body onload="populateColors();config();">
 	<div id="grad">&nbsp;</div>
 	<div id="about">
-		<h1 style="font-family:Serif;">R  E  L  A  X</h1>
+		<h1>r   e   l   a   x</h1>
 		<div id="status"></div>
 		<div id="play"><a href="#" id="state" onclick="mute();">mute</a></div>
 
@@ -407,6 +388,7 @@ function toggleOptions(){
 	</div>
 
 	<div id="options">
+		<p>Note: Time-based changes will not occur while "Custom Settings" is selected.</p>
 		<select id="key" name="key">
 			<option value="c">C</option>
 			<option value="d">D</option>
@@ -446,6 +428,8 @@ function toggleOptions(){
 		<label for="volume">Volume</label>
 		<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
 		<input type="text" id="volDisplay" value="50%" size=3 readonly>
+		<label for="color">Color</label>
+		<select id="color" name="color" onchange="document.getElementsByTagName('body')[0].style.backgroundColor=this.value;"></select>
 	</div>
 </body>
 </html>
