@@ -9,6 +9,9 @@
 //# sourceMappingURL=tonal.min.js.map
 </script>
 <style>
+* {
+	transition: opacity 1s;
+}
 html {
 	height: 100%;
 }
@@ -25,7 +28,7 @@ body {
 	width: 101%;
 	height: 101%;
 	background-color: lightblue;
-	background: radial-gradient(white,transparent,transparent);
+	background: linear-gradient(white,transparent,transparent);
 }
 * {
 	font-family: Arial, Sans-Serif;
@@ -77,17 +80,20 @@ h1 {
 	opacity: 0.5;
 }
 
-#options {
+#options, #medTimer {
 	opacity: 0;
-	transition: opacity 1s;
 	display: block;
-	position: fixed;
-	top: 40%;
 	left: 2px;
 	width: 100%;
 	text-align: center;
 	z-index: 999;
 }
+
+#medTimer {
+	opacity: 0.8;
+	display: block;
+}
+
 
 select, input {
 	font-size: 2em;
@@ -120,13 +126,18 @@ label {
 	padding: 8px 16px;
 	color: #333;
 }
+
+#medTimerActive {
+	display: none;
+}
 </style>
 <script>
 var state = -1;
 var t;
+var d;
 var attack = 10;
 var audio = new (window.AudioContext || window.webkitAudioContext)();
-var colors = new Array("#000000","#1B1B1B","#614051","#732E6C","#A63A79","#3F26BF","#4F69C6","#2887C8","#0095B7","#29AB87","#63B76C","#BEE64B","#D9E650","#FFFF99","#E6BC5C","#E97451","#DA614E","#C62D42","#9C2542","#8A496B","#5946B2","#58427C","#2E2D88","#1B1B1B");
+var colors = new Array("#1B1B1B","#666","#614051","#732E6C","#A63A79","#3F26BF","#4F69C6","#2887C8","#0095B7","#29AB87","#63B76C","#BEE64B","#D9E650","#FFFF99","#E6BC5C","#E97451","#DA614E","#C62D42","#9C2542","#8A496B","#5946B2","#58427C","#2E2D88","#1B1B1B");
 
 window.addEventListener('touchstart', function() {
 	// create empty buffer
@@ -262,47 +273,56 @@ function play(state){
 		return;
 	}
 
-	let nextPhrase = 0;
+	let voices = document.getElementById("voices").value;
 
-	let theme = getTheme();
+	for ( voice = 0 ; voice < voices ; voice++ ){
 
-	let thisPhrase = separateTones(theme,2);
+		var nextPhrase = 0;
+		let theme = getTheme();
 
-	let drone = thisPhrase['drone'][Math.floor(Math.random()*thisPhrase['drone'].length)];
-	let phraseLen = Math.floor(Math.random()*thisPhrase['melody'].length);
-	let phrase = new Array();
+		let thisPhrase = separateTones(theme,2);
 
-	for (a = 0;a < phraseLen;a++ ){
-		phrase.push(thisPhrase['melody'][Math.floor(Math.random()*thisPhrase['melody'].length)]);
-	}
+		let drone = thisPhrase['drone'][Math.floor(Math.random()*thisPhrase['drone'].length)];
+		let phraseLen = Math.floor(Math.random()*thisPhrase['melody'].length);
+		let phrase = new Array();
 
-	let volume = Math.random()*0.15
-	let delay = Math.random()*8000;
-	let x = (Math.random()*300 - 150);
-	let y = (Math.random()*300 - 150);
-	let z = (Math.random()*300 - 150);
-	let release = attack + length;
-	nextPhrase += release;
+		for (a = 0;a < phraseLen;a++ ){
+			phrase.push(thisPhrase['melody'][Math.floor(Math.random()*thisPhrase['melody'].length)]);
+		}
 
-	var noteDelay = 0;
-	for (b=0;b<=phrase.length;b++){
-		let length = document.getElementById("activity").value*((Math.floor(Math.random()*8)+1)/8);
 		let volume = Math.random()*0.15
-		nextPhrase += length;
+		let delay = Math.random()*8000;
 		let x = (Math.random()*300 - 150);
 		let y = (Math.random()*300 - 150);
 		let z = (Math.random()*300 - 150);
 		let release = attack + length;
-		let playNote = Tonal.Note.freq(theme[b]);
-		if ( b < phrase.length ){
-			t = setTimeout( 'synth("sine",'+Tonal.Note.freq(phrase[b])+','+volume+','+attack+','+length+','+release+','+x+','+y+','+z+',"'+phrase[b]+'");', noteDelay );
+		nextPhrase += release;
+
+		var noteDelay = 0;
+		for (b=0;b<=phrase.length;b++){
+			let length = document.getElementById("activity").value*((Math.floor(Math.random()*8)+1)/8);
+			let volume = Math.random()*0.15
+			nextPhrase += length;
+			let x = (Math.random()*300 - 150);
+			let y = (Math.random()*300 - 150);
+			let z = (Math.random()*300 - 150);
+			let release = attack + length;
+			let playNote = Tonal.Note.freq(theme[b]);
+			if ( b < phrase.length ){
+				t = setTimeout( 'synth("sine",'+Tonal.Note.freq(phrase[b])+','+volume+','+attack+','+length+','+release+','+x+','+y+','+z+',"'+phrase[b]+'");', noteDelay+(Math.random()*1000) );
+			}
+			else {
+				// nothing
+			}
+			noteDelay += length;
 		}
-		else {
-			t = setTimeout(function(){play(state);}, nextPhrase);
-		}
-		noteDelay += length;
+
+		d = setTimeout ( 'synth("sine",'+Tonal.Note.freq(drone)+','+volume+','+attack+','+nextPhrase+','+release+','+x+','+y+','+z+',"'+drone+'");',voice*(Math.random()*1000));
+
 	}
-	synth("sine",Tonal.Note.freq(drone),volume,attack,nextPhrase,release,x,y,z,drone);
+
+	t = setTimeout(function(){play(state);}, nextPhrase);
+
 }
 
 var c;
@@ -372,9 +392,72 @@ function populateColors(){
 		document.getElementById("color").appendChild(o);
 	}
 }
+
+
+function weather(position){
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', "https://api.darksky.net/forecast/8974389dfc45d788f6b7f62d94d5dd36/"+position.coords.latitude+","+position.coords.longitude);
+	xhr.onload = function() {
+		var w = (JSON.parse(xhr.responseText));
+		alert(w);
+	};
+	xhr.send();
+}
+
+function getPosition(){
+	navigator.geolocation.getCurrentPosition(weather);
+}
+
+var timeLeft = 0;
+function timer(x){
+	if ( x == 1 ){
+		timeLeft = document.getElementById("timer").value*60;
+		document.getElementById("timer").style.display = "none";
+		document.getElementById("medTimerActive").style.display = "inline";
+		count();
+		document.getElementById("medToggle").value="Stop";
+		document.getElementById("medToggle").setAttribute("onclick","timer(0);");
+		state = 0;
+		document.getElementById("about").style.opacity = 0;
+		if ( document.getElementById("settings").checked === true ){
+			document.getElementById("options").style.opacity = 0;
+		}
+	}
+	else {
+		document.getElementById("medToggle").value="Start";
+		document.getElementById("medToggle").setAttribute("onclick","timer(1);");
+		document.getElementById("timer").style.display = "inline";
+		document.getElementById("medTimerActive").style.display = "none";
+		timeLeft = 0;
+		state = 1;
+		document.getElementById("about").style.opacity = 0.8;
+		if ( document.getElementById("settings").checked === true ){
+			document.getElementById("options").style.opacity = 0.8;
+		}
+	}
+	play(state);
+}
+
+var t;
+function count(){
+	if ( timeLeft >= 1){
+		let m = Math.floor(timeLeft/60);
+		let s = timeLeft - (m*60);
+		if ( m <= 9 ){ m = "0"+m; }
+		if ( s <= 9 ){ s = "0"+s; }
+		document.getElementById("medTimerActive").value = m + ":" + s;
+		t = setTimeout(function(){count();},1000);
+	}
+	else {
+		timer(0);
+	}
+	timeLeft = timeLeft - 1;
+}
+
 </script>
+
 </head>
-<body onload="populateColors();config();">
+<body onload="populateColors();config();/*getPosition();*/">
 	<div id="grad">&nbsp;</div>
 	<div id="about">
 		<h1>r   e   l   a   x</h1>
@@ -385,6 +468,47 @@ function populateColors(){
 
 		<input type="checkbox" name="settings" id="settings" onclick="toggleOptions();">
 		<label for="settings">Custom Settings</label><br/>
+	</div>
+
+
+
+
+	<div id="medTimer">
+		<label for="timer">Meditation Timer:</label>
+		<input type="text" id="medTimerActive" readonly size=5>
+		<select id="timer" name="timer">
+			<option value=1>1:00</option>
+			<option value=2>2:00</option>
+			<option value=3>3:00</option>
+			<option value=4>4:00</option>
+			<option value=5>5:00</option>
+			<option value=6>6:00</option>
+			<option value=7>7:00</option>
+			<option value=8>8:00</option>
+			<option value=9>9:00</option>
+			<option value=10>10:00</option>
+			<option value=11>11:00</option>
+			<option value=12>12:00</option>
+			<option value=13>13:00</option>
+			<option value=14>14:00</option>
+			<option value=15>15:00</option>
+			<option value=16>16:00</option>
+			<option value=17>17:00</option>
+			<option value=18>18:00</option>
+			<option value=19>19:00</option>
+			<option value=20>20:00</option>
+			<option value=21>21:00</option>
+			<option value=22>22:00</option>
+			<option value=23>23:00</option>
+			<option value=24>24:00</option>
+			<option value=25>25:00</option>
+			<option value=26>26:00</option>
+			<option value=27>27:00</option>
+			<option value=28>28:00</option>
+			<option value=29>29:00</option>
+			<option value=30>30:00</option>
+		</select>
+		<input type="button" id="medToggle" value="start" onclick="timer(1);">
 	</div>
 
 	<div id="options">
@@ -425,10 +549,19 @@ function populateColors(){
 			<option value=250>Soft</option>
 		</select>
 		<br/>
-		<label for="volume">Volume</label>
+		<label for="voices">Simultaneity:</label>
+		<select id="voices" name="voices">
+			<option value=1 selected>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<!--<option value=4>4</option>
+			<option value=5>5</option>-->
+		</select>
+		<br/>
+		<label for="volume">Volume:</label>
 		<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
 		<input type="text" id="volDisplay" value="50%" size=3 readonly>
-		<label for="color">Color</label>
+		<label for="color">Color:</label>
 		<select id="color" name="color" onchange="document.getElementsByTagName('body')[0].style.backgroundColor=this.value;"></select>
 	</div>
 </body>
