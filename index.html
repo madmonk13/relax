@@ -20,7 +20,7 @@ body {
 	transition: background-color 2s;
 }
 #grad {
-	display: block;
+	display: none;
 	position: fixed;
 	z-index: 0;
 	left: -10px;
@@ -37,19 +37,6 @@ body {
 	0% { opacity: 1; }
 	50% { opacity: 0; }
 	100% { opacity: 1; }
-}
-h1 {
-	animation-name: fader;
-	animation-duration: 60s;
-	animation-iteration-count: infinite;
-}
-#about {
-	opacity: 0.8;
-	display: block;
-	width: 100%;
-	text-align: center;
-	margin-top: 10%;
-	z-index: 1;
 }
 @keyframes droplet {
 	0% { opacity: 1.0; transform:scale(1,1);}
@@ -84,8 +71,6 @@ h1 {
 	opacity: 0;
 	display: block;
 	left: 2px;
-	width: 100%;
-	text-align: center;
 	z-index: 999;
 }
 
@@ -94,41 +79,33 @@ h1 {
 	display: block;
 }
 
-
-select, input {
-	font-size: 2em;
-	background-color: #fff;
-	color: #000;
-	opacity: 0.8;
-	border-radius: 10px;
-	text-align: center;
-	padding: .25em;
-	margin: .25em 0;
-}
-label {
-	font-size: 2em;
-	opacity: 0.8;
-	border-radius: 10px;
-	text-align: center;
-	padding: 2px;
-}
-
-#about label {
-	font-size: 1em;
-	color: #000;
-}
-
-#status {
-	display: none;
-}
-
-#stateButton {
-	padding: 8px 16px;
-	color: #333;
-}
-
 #medTimerActive {
 	display: none;
+}
+table {
+	background-color: rgba(0,0,0,0.75);
+	color: #fff;
+	padding: 10px;
+	border-radius: 10px;
+	font-size: 0.9em;
+	letter-spacing: 0.1em;
+}
+select, input, button {
+	background-color: rgba(255,255,255,0.95);
+	color: #000;
+	border: none;
+	border-radius: 3px;
+}
+
+#mainTable {
+	transition: all 1s;
+	opacity: 0.15;
+	width: 300px;
+	height: auto;
+}
+
+#mainTable:hover {
+	opacity: 1;
 }
 </style>
 <script>
@@ -266,10 +243,10 @@ function play(state){
 	config();
 
 	if ( state%2 == 0 ){
-		document.getElementById("stateButton").value = "Pause";
+		document.getElementById("stateButton").value = "pause";
 	}
 	else {
-		document.getElementById("stateButton").value = "Play";
+		document.getElementById("stateButton").value = "play";
 		return;
 	}
 
@@ -459,110 +436,145 @@ function count(){
 </head>
 <body onload="populateColors();config();/*getPosition();*/">
 	<div id="grad">&nbsp;</div>
-	<div id="about">
-		<h1>r   e   l   a   x</h1>
-		<div id="status"></div>
-		<div id="play"><a href="#" id="state" onclick="mute();">mute</a></div>
 
-		<input type="button" value="Play" id="stateButton" onclick="clearTimeout(t);state++;play(state);"><br/>
-
-		<input type="checkbox" name="settings" id="settings" onclick="toggleOptions();">
-		<label for="settings">Custom Settings</label><br/>
-	</div>
-
-
-
-
-	<div id="medTimer">
-		<label for="timer">Meditation Timer:</label>
-		<input type="text" id="medTimerActive" readonly size=5>
-		<select id="timer" name="timer">
-			<option value=1>1:00</option>
-			<option value=2>2:00</option>
-			<option value=3>3:00</option>
-			<option value=4>4:00</option>
-			<option value=5>5:00</option>
-			<option value=6>6:00</option>
-			<option value=7>7:00</option>
-			<option value=8>8:00</option>
-			<option value=9>9:00</option>
-			<option value=10>10:00</option>
-			<option value=11>11:00</option>
-			<option value=12>12:00</option>
-			<option value=13>13:00</option>
-			<option value=14>14:00</option>
-			<option value=15>15:00</option>
-			<option value=16>16:00</option>
-			<option value=17>17:00</option>
-			<option value=18>18:00</option>
-			<option value=19>19:00</option>
-			<option value=20>20:00</option>
-			<option value=21>21:00</option>
-			<option value=22>22:00</option>
-			<option value=23>23:00</option>
-			<option value=24>24:00</option>
-			<option value=25>25:00</option>
-			<option value=26>26:00</option>
-			<option value=27>27:00</option>
-			<option value=28>28:00</option>
-			<option value=29>29:00</option>
-			<option value=30>30:00</option>
-		</select>
-		<input type="button" id="medToggle" value="start" onclick="timer(1);">
-	</div>
-
-	<div id="options">
-		<p>Note: Time-based changes will not occur while "Custom Settings" is selected.</p>
-		<select id="key" name="key">
-			<option value="c">C</option>
-			<option value="d">D</option>
-			<option value="e">E</option>
-			<option value="f">F</option>
-			<option value="g" selected>G</option>
-			<option value="a">A</option>
-			<option value="b">B</option>
-		</select>
-		<select id="mod" name="mod">
-			<option value="b">Flat</option>
-			<option value="" selected>Natural</option>
-			<option value="#">Sharp</option>
-		</select>
-		<select id="scale" name="scale">
-			<option value="pentatonic" selected>Pentatonic</option>
-			<option value="major">Major</option>
-			<option value="minor">Minor</option>
-<!--			<option value="dorian">Dorian</option>
-			<option value="phrygian">Phrygian</option>
-			<option value="lydian">Lydian</option>
-			<option value="mixolydian">Mixolydian</option>
-			<option value="Aeolian">Aeolian</option>
-			<option value="locrian">Locrian</option>-->
-		</select>
-		<select id="activity" name="activity">
-			<option value=1000>Busy</option>
-			<option value=2000>Alert</option>
-			<option value=4000 selected>Calm</option>
-			<option value=8000>Sparse</option>
-		</select>
-		<select id="attack" name="attack" onchange="attack=this.value*1;">
-			<option value=10>Crisp</option>
-			<option value=250>Soft</option>
-		</select>
-		<br/>
-		<label for="voices">Simultaneity:</label>
-		<select id="voices" name="voices">
-			<option value=1 selected>1</option>
-			<option value=2>2</option>
-			<option value=3>3</option>
-			<!--<option value=4>4</option>
-			<option value=5>5</option>-->
-		</select>
-		<br/>
-		<label for="volume">Volume:</label>
-		<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
-		<input type="text" id="volDisplay" value="50%" size=3 readonly>
-		<label for="color">Color:</label>
-		<select id="color" name="color" onchange="document.getElementsByTagName('body')[0].style.backgroundColor=this.value;"></select>
-	</div>
+	<table id="mainTable">
+		<tr>
+			<td>relax.</td>
+			<td>
+				<input type="button" value="Play" id="stateButton" onclick="clearTimeout(t);state++;play(state);">
+			</td>
+		<tr>
+		<tr>
+			<td>meditation timer</td>
+			<td>
+				<input type="text" id="medTimerActive" readonly size=5>
+				<select id="timer" name="timer">
+					<option value=1>1:00</option>
+					<option value=2>2:00</option>
+					<option value=3>3:00</option>
+					<option value=4>4:00</option>
+					<option value=5>5:00</option>
+					<option value=6>6:00</option>
+					<option value=7>7:00</option>
+					<option value=8>8:00</option>
+					<option value=9>9:00</option>
+					<option value=10>10:00</option>
+					<option value=11>11:00</option>
+					<option value=12>12:00</option>
+					<option value=13>13:00</option>
+					<option value=14>14:00</option>
+					<option value=15>15:00</option>
+					<option value=16>16:00</option>
+					<option value=17>17:00</option>
+					<option value=18>18:00</option>
+					<option value=19>19:00</option>
+					<option value=20>20:00</option>
+					<option value=21>21:00</option>
+					<option value=22>22:00</option>
+					<option value=23>23:00</option>
+					<option value=24>24:00</option>
+					<option value=25>25:00</option>
+					<option value=26>26:00</option>
+					<option value=27>27:00</option>
+					<option value=28>28:00</option>
+					<option value=29>29:00</option>
+					<option value=30>30:00</option>
+				</select>
+				<input type="button" id="medToggle" value="start" onclick="timer(1);">
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2><div id="status"></div></td>
+		</tr>
+		<tr>
+			<td>custom settings</td>
+			<td><input type="checkbox" name="settings" id="settings" onclick="toggleOptions();"></td>
+		</tr>
+		<tr>
+			<td colspan=2>
+				<div id="options">
+				<table>
+					<tr>
+						<td colspan=2>note: time-based changes will not occur while "custom settings" is selected.</td>
+					</tr>
+					<tr>
+						<td>tonality</td>
+						<td>
+							<select id="key" name="key">
+								<option value="c">C</option>
+								<option value="d">D</option>
+								<option value="e">E</option>
+								<option value="f">F</option>
+								<option value="g" selected>G</option>
+								<option value="a">A</option>
+								<option value="b">B</option>
+							</select>
+							<select id="mod" name="mod">
+								<option value="b">Flat</option>
+								<option value="" selected>Natural</option>
+								<option value="#">Sharp</option>
+							</select>
+							<select id="scale" name="scale">
+								<option value="pentatonic" selected>Pentatonic</option>
+								<option value="major">Major</option>
+								<option value="minor">Minor</option>
+					<!--			<option value="dorian">Dorian</option>
+								<option value="phrygian">Phrygian</option>
+								<option value="lydian">Lydian</option>
+								<option value="mixolydian">Mixolydian</option>
+								<option value="Aeolian">Aeolian</option>
+								<option value="locrian">Locrian</option>-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>activity</td>
+						<td>
+							<select id="activity" name="activity">
+								<option value=1000>Busy</option>
+								<option value=2000>Alert</option>
+								<option value=4000 selected>Calm</option>
+								<option value=8000>Sparse</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>attack</td>
+						<td>
+							<select id="attack" name="attack" onchange="attack=this.value*1;">
+								<option value=10>Crisp</option>
+								<option value=250>Soft</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>voices</td>
+						<td>
+							<label for="voices">Simultaneity:</label>
+							<select id="voices" name="voices">
+								<option value=1 selected>1</option>
+								<option value=2>2</option>
+								<option value=3>3</option>
+								<!--<option value=4>4</option>
+								<option value=5>5</option>-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>volume</td>
+						<td>
+							<input type="range" min="0" max="100" value="50" class="slider" id="volume" onchange="document.getElementById('volDisplay').value=this.value+'%';">
+						</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td>
+							<select id="color" name="color" onchange="document.getElementsByTagName('body')[0].style.backgroundColor=this.value;"></select>
+						</td>
+				</table>
+				</div>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>
