@@ -5,3 +5,7 @@ Additional features include a meditation timer and the ability to override gener
 <a href='https://madmonk13.github.io/relax/'>Relax can be viewed via this link.</a>
 
 At this time, microsoft browsers do not support the Webaudio API.
+
+Todo:
+1. Improve interface
+2. Introduce complex waveforms to create new timbre.
