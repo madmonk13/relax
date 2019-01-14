@@ -2,4 +2,6 @@ Relax is an ambient music generator using HTML5's Webaudio API.  A specific tona
 
 Additional features include a meditation timer and the ability to override generated settings and specify your own.
 
+<a href='https://madmonk13.github.io/relax/'>Relax can be viewed via this link.</a>
+
 At this time, microsoft browsers do not support the Webaudio API.
